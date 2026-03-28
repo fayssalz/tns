@@ -123,7 +123,7 @@ function App() {
     <div className="app-container">
       <div className="controls-section glass-panel">
         <div>
-          <h1>Tennis Bracelet Configurator</h1>
+          <h1>Tennis Bracelet Making Estimation</h1>
           <p className="subtitle">
             Fine-tune specifications for your perfect piece. All sizing elements react bidirectionally to ensure physical accuracy.
           </p>
