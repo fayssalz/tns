@@ -171,7 +171,7 @@ function App() {
         />
 
         <div className="section glass-panel" style={{ marginTop: '1.5rem', padding: '1.5rem', border: '1px solid var(--accent)' }}>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--accent)' }}>Estimated Retail Total</h2>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--accent)' }}>Estimated Total Cost</h2>
           <div className="melt-row" style={{ marginTop: '0.25rem' }}>
             <span className="melt-lbl">Total Settings & Gold Cost</span>
             <span className="melt-val">${goldCost.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
