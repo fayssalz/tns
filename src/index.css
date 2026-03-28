@@ -67,6 +67,7 @@ h1 {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh; /* use dynamic viewport height for mobile browsers */
   width: 100vw;
   max-width: 1440px;
   margin: 0 auto;
@@ -82,9 +83,11 @@ h1 {
 }
 
 .visualizer-section {
+  order: -1; /* Renders at the top on mobile */
   flex: 1;
   position: relative;
-  min-height: 40vh;
+  min-height: 50vh;
+  min-height: 50dvh;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border);
@@ -94,18 +97,28 @@ h1 {
 
 @media (min-width: 1024px) {
   .visualizer-section {
+    order: 0; /* Return to right column */
     min-height: auto;
   }
 }
 
 .controls-section {
+  flex: 1;
   width: 100%;
-  max-width: 480px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  padding: 2rem;
+  padding: 1.25rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
+}
+
+@media (min-width: 1024px) {
+  .controls-section {
+    max-width: 480px;
+    padding: 2rem;
+  }
 }
 
 /* Slider Customization */
