@@ -22,12 +22,18 @@ export const getDiameterFromCarat = (ct) => {
 };
 
 function App() {
-  // State variables
-  const [length, setLength] = useState(170); // mm (17cm)
-  const [numDiamonds, setNumDiamonds] = useState(80);
-  const [diameter, setDiameter] = useState(1.7);
-  const [carat, setCarat] = useState(0.02);
-  const [totalCarat, setTotalCarat] = useState(1.6);
+  const getQueryParam = (key, defaultVal, isFloat = true) => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has(key)) return defaultVal;
+    return isFloat ? parseFloat(params.get(key)) : params.get(key);
+  };
+
+  // State variables initialised from URL params (if present)
+  const [length, setLength] = useState(() => getQueryParam('length', 170));
+  const [numDiamonds, setNumDiamonds] = useState(() => Math.round(getQueryParam('num', 80)));
+  const [diameter, setDiameter] = useState(() => getQueryParam('d', 1.7));
+  const [carat, setCarat] = useState(() => getQueryParam('ct', 0.02));
+  const [totalCarat, setTotalCarat] = useState(() => getQueryParam('tc', 1.6));
   const [claspLength, setClaspLength] = useState(15); // mm
   
   // The intrinsic gap is derived or fixed. Let's make gap fixed for simplicity unless modified.
@@ -87,9 +93,22 @@ function App() {
   // We will let the math hold standard spatial laws.
 
   useEffect(() => {
-    // Initial sync
-    handleDiameterChange(3.0);
+    // If no URL params are present, run an initial sync to populate default sizes properly
+    if (!window.location.search) {
+      handleDiameterChange(3.0);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist state changes back to the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('length', length);
+    params.set('num', numDiamonds);
+    params.set('d', diameter);
+    params.set('ct', carat);
+    params.set('tc', totalCarat);
+    window.history.replaceState(null, '', '?' + params.toString());
+  }, [length, numDiamonds, diameter, carat, totalCarat]);
 
   const state = {
     length, numDiamonds, diameter, carat, totalCarat, claspLength, gap

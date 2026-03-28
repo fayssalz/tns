@@ -12,8 +12,14 @@ const alloyNotes = {
 };
 
 const GoldCalculator = ({ numDiamonds, diameter }) => {
-  const [karat, setKarat] = useState('14ni');
-  const [perLinkWeight, setPerLinkWeight] = useState(0.080);
+  const getQueryParam = (key, defaultVal, isFloat = true) => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has(key)) return defaultVal;
+    return isFloat ? parseFloat(params.get(key)) : params.get(key);
+  };
+
+  const [karat, setKarat] = useState(() => getQueryParam('k', '14ni', false));
+  const [perLinkWeight, setPerLinkWeight] = useState(() => getQueryParam('plw', 0.080));
   const [spotPrice, setSpotPrice] = useState(95); // fallback default
   const [status, setStatus] = useState('Connecting to live feed...');
   const [statusColor, setStatusColor] = useState('var(--text-secondary)');
@@ -53,6 +59,14 @@ const GoldCalculator = ({ numDiamonds, diameter }) => {
 
     return () => socket.disconnect();
   }, []);
+
+  // Sync these specific panel settings to URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('k', karat);
+    params.set('plw', perLinkWeight);
+    window.history.replaceState(null, '', '?' + params.toString());
+  }, [karat, perLinkWeight]);
 
   const density = densities[karat];
   const purity = purities[karat];
