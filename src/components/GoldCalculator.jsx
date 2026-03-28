@@ -11,7 +11,7 @@ const alloyNotes = {
   '18pd': '18k palladium white gold is the premium standard \u2014 denser, hypoallergenic, and visibly whiter.'
 };
 
-const GoldCalculator = ({ numDiamonds, diameter }) => {
+const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
   const getQueryParam = (key, defaultVal, isFloat = true) => {
     const params = new URLSearchParams(window.location.search);
     if (!params.has(key)) return defaultVal;
@@ -20,6 +20,7 @@ const GoldCalculator = ({ numDiamonds, diameter }) => {
 
   const [karat, setKarat] = useState(() => getQueryParam('k', '14ni', false));
   const [perLinkWeight, setPerLinkWeight] = useState(() => getQueryParam('plw', 0.080));
+  const [makingCharge, setMakingCharge] = useState(() => getQueryParam('mc', 30.0));
   const [spotPrice, setSpotPrice] = useState(95); // fallback default
   const [status, setStatus] = useState('Connecting to live feed...');
   const [statusColor, setStatusColor] = useState('var(--text-secondary)');
@@ -65,8 +66,9 @@ const GoldCalculator = ({ numDiamonds, diameter }) => {
     const params = new URLSearchParams(window.location.search);
     params.set('k', karat);
     params.set('plw', perLinkWeight);
+    params.set('mc', makingCharge);
     window.history.replaceState(null, '', '?' + params.toString());
-  }, [karat, perLinkWeight]);
+  }, [karat, perLinkWeight, makingCharge]);
 
   const density = densities[karat];
   const purity = purities[karat];
@@ -76,6 +78,15 @@ const GoldCalculator = ({ numDiamonds, diameter }) => {
   const wTotal = wSettings + claspWeight;
   const goldGrams = wTotal * purity;
   const meltValue = goldGrams * spotPrice;
+  const manufacturingCost = wTotal * makingCharge;
+  const totalGoldCost = meltValue + manufacturingCost;
+
+  useEffect(() => {
+    if (onTotalsChange) {
+      onTotalsChange({ wTotal, meltValue, totalGoldCost });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wTotal, meltValue, totalGoldCost]);
 
   return (
     <div className="section glass-panel" style={{ marginTop: '1.5rem', padding: '1.5rem' }}>
@@ -122,6 +133,27 @@ const GoldCalculator = ({ numDiamonds, diameter }) => {
         />
       </div>
 
+      <div className="control-group">
+        <div className="control-header">
+          <label className="control-label">Labor/Making Charge ($/g)</label>
+          <input 
+            type="number" 
+            className="control-value-input" 
+            value={makingCharge.toFixed(0)} 
+            step="1"
+            onChange={(e) => setMakingCharge(parseFloat(e.target.value))} 
+          />
+        </div>
+        <input 
+          type="range" 
+          min="0" 
+          max="150" 
+          step="5" 
+          value={makingCharge} 
+          onChange={(e) => setMakingCharge(parseFloat(e.target.value))} 
+        />
+      </div>
+
       <div className="cards">
         <div className="card">
           <div className="card-lbl">Density used</div>
@@ -152,9 +184,17 @@ const GoldCalculator = ({ numDiamonds, diameter }) => {
           <span className="melt-lbl">Pure gold (grams)</span>
           <span className="melt-val">{goldGrams.toFixed(2)} g</span>
         </div>
-        <div className="melt-row" style={{ marginTop: '0.5rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
-          <span className="melt-lbl" style={{ color: 'var(--accent)', fontSize: '1.1rem', fontWeight: 600 }}>Melt Value</span>
-          <span className="melt-val" style={{ color: 'var(--text-primary)', fontSize: '1.35rem' }}>${meltValue.toFixed(0)}</span>
+        <div className="melt-row" style={{ marginTop: '0.25rem' }}>
+          <span className="melt-lbl" style={{ color: 'var(--accent)'}}>Intrinsic Melt Value</span>
+          <span className="melt-val" style={{ color: 'var(--accent)'}}>${meltValue.toFixed(0)}</span>
+        </div>
+        <div className="melt-row" style={{ marginTop: '0.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
+          <span className="melt-lbl">Labor/Making Charge</span>
+          <span className="melt-val">${manufacturingCost.toFixed(0)}</span>
+        </div>
+        <div className="melt-row" style={{ marginTop: '0.5rem', paddingTop: '0.5rem' }}>
+          <span className="melt-lbl" style={{ color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 600 }}>Total Setting Cost</span>
+          <span className="melt-val" style={{ color: 'var(--text-primary)', fontSize: '1.35rem' }}>${totalGoldCost.toFixed(0)}</span>
         </div>
       </div>
 

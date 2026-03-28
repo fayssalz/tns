@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import SizerCalculator from './components/SizerCalculator';
 import BraceletVisualizer from './components/BraceletVisualizer';
 import GoldCalculator from './components/GoldCalculator';
+import DiamondPriceCalculator from './components/DiamondPriceCalculator';
 import './index.css';
 
 // Core default assumptions (based loosely on standard brilliant cuts and jewelry settings)
@@ -39,6 +40,10 @@ function App() {
   // The intrinsic gap is derived or fixed. Let's make gap fixed for simplicity unless modified.
   // Gap = distance between stones
   const [gap, setGap] = useState(0.2); // mm default gap
+  
+  // Totals
+  const [goldCost, setGoldCost] = useState(0);
+  const [diamondCost, setDiamondCost] = useState(0);
   
   // Handlers for bidirectional updating
   // When Length changes: Adjust Number of Diamonds (keeping diameter/gap fixed)
@@ -156,7 +161,30 @@ function App() {
         <GoldCalculator 
           numDiamonds={numDiamonds} 
           diameter={diameter} 
+          onTotalsChange={(costs) => setGoldCost(costs.totalGoldCost)}
         />
+
+        <DiamondPriceCalculator 
+          numDiamonds={numDiamonds} 
+          caratWeight={carat} 
+          onTotalsChange={setDiamondCost}
+        />
+
+        <div className="section glass-panel" style={{ marginTop: '1.5rem', padding: '1.5rem', border: '1px solid var(--accent)' }}>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--accent)' }}>Estimated Retail Total</h2>
+          <div className="melt-row" style={{ marginTop: '0.25rem' }}>
+            <span className="melt-lbl">Total Settings & Gold Cost</span>
+            <span className="melt-val">${goldCost.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
+          </div>
+          <div className="melt-row" style={{ marginTop: '0.25rem' }}>
+            <span className="melt-lbl">Total Diamond Cost</span>
+            <span className="melt-val">${diamondCost.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
+          </div>
+          <div className="melt-row" style={{ marginTop: '0.75rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
+            <span className="melt-lbl" style={{ color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 600 }}>Grand Total</span>
+            <span className="melt-val" style={{ color: 'var(--accent)', fontSize: '1.75rem' }}>${(goldCost + diamondCost).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
+          </div>
+        </div>
       </div>
 
       <div className="visualizer-section">
