@@ -170,7 +170,7 @@ const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
       </div>
 
       <div className="melt-box" style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-md)' }}>
-        <h3 className="melt-title" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>Intrinsic Material Value</h3>
+        <h3 className="melt-title" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>Gold Material Value</h3>
         
         <div className="melt-row">
           <span className="melt-lbl">Live Gold Spot (24k)</span>
@@ -185,7 +185,7 @@ const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
           <span className="melt-val">{goldGrams.toFixed(2)} g</span>
         </div>
         <div className="melt-row" style={{ marginTop: '0.25rem' }}>
-          <span className="melt-lbl" style={{ color: 'var(--accent)'}}>Intrinsic Melt Value</span>
+          <span className="melt-lbl" style={{ color: 'var(--accent)'}}>Gold Melt Value</span>
           <span className="melt-val" style={{ color: 'var(--accent)'}}>${meltValue.toFixed(0)}</span>
         </div>
         <div className="melt-row" style={{ marginTop: '0.25rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>

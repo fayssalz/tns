@@ -193,7 +193,7 @@ const DiamondPriceCalculator = ({ numDiamonds, caratWeight, onTotalsChange }) =>
         setPrices(data.response.body.price);
         localStorage.setItem('dwc_admin_key', currentPasscode);
       } else {
-        throw new Error("Invalid Credentials or RapNet Response");
+        throw new Error("Invalid Credentials");
       }
     } catch (e) {
       setApiError(e.message);
@@ -285,7 +285,7 @@ const DiamondPriceCalculator = ({ numDiamonds, caratWeight, onTotalsChange }) =>
   return (
     <div className="section glass-panel" style={{ marginTop: '1.5rem', padding: '1.5rem', position: 'relative' }}>
       <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        Live Diamond RapNet Calculator
+        Live Diamond price
         <button 
           onClick={() => setShowVault(true)}
           style={{ 
@@ -302,7 +302,7 @@ const DiamondPriceCalculator = ({ numDiamonds, caratWeight, onTotalsChange }) =>
       {showVault && (
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, borderRadius: 'var(--radius-lg)' }}>
           <div style={{ background: '#1a1f33', padding: '2rem', borderRadius: '10px', textAlign: 'center', width: '80%' }}>
-            <h3 style={{ marginBottom: '1rem' }}>Enter Rapaport Passcode</h3>
+            <h3 style={{ marginBottom: '1rem' }}>Enter Passcode</h3>
             <input 
               type="password" 
               value={vaultInput} 
@@ -390,7 +390,7 @@ const DiamondPriceCalculator = ({ numDiamonds, caratWeight, onTotalsChange }) =>
             <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)', fontSize: '0.85rem' }}>
               <div style={{ fontWeight: 'bold', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Price Breakdown</div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Base RapNet List / Ct:</span> <span>${basePricePerCarat.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
+                <span>Base priceList / Ct:</span> <span>${basePricePerCarat.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
               </div>
               {lowColorDiscount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#ff7675' }}>
