@@ -56,14 +56,23 @@ function App() {
     setTotalCarat(Number((newNum * carat).toFixed(3)));
   };
 
-  // When Number of Diamonds changes: Adjust Length (keeping diameter/gap fixed)
-  const handleNumDiamondsChange = (val) => {
-    setNumDiamonds(val);
-    const linkSize = diameter + gap;
-    const newLength = (val * linkSize) + claspLength;
-    setLength(Number(newLength.toFixed(3)));
-    setTotalCarat(Number((val * carat).toFixed(3)));
-  };
+  // When Number of Diamonds changes: Adjust diameter (keeping length fixed)
+const handleNumDiamondsChange = (val) => {
+  setNumDiamonds(val);
+  
+  // Calculate new diameter to fit current length
+  const usableLength = length - claspLength;
+  const availablePerDiamond = usableLength / val;
+  const newDiameter = Math.max(0, availablePerDiamond - gap);
+  setDiameter(Number(newDiameter.toFixed(3)));
+  
+  // Update carat based on new diameter
+  const newCarat = getCaratFromDiameter(newDiameter);
+  setCarat(newCarat);
+  
+  // Update total carat
+  setTotalCarat(Number((val * newCarat).toFixed(3)));
+};
 
   // When Diameter changes: Update Carat, recalculate Number of Diamonds to fit the CURRENT Length
   const handleDiameterChange = (val) => {
