@@ -11,6 +11,30 @@ const alloyNotes = {
   '18pd': '18k palladium white gold is the premium standard \u2014 denser, hypoallergenic, and visibly whiter.'
 };
 
+// Physics-based per-link weight calculation
+export const calculatePerLinkWeight = (diameterMm, karatType) => {
+  const DIAMOND_DENSITY = 3.52; // g/cm³ (for reference)
+  const SETTING_THICKNESS_RATIO = 0.35; // Gold setting is ~35% of diamond volume
+  
+  const density = densities[karatType] || 14.7;
+  const purity = purities[karatType] || 0.75;
+  
+  // Convert mm to cm
+  const diameterCm = diameterMm / 10;
+  const radius = diameterCm / 2;
+  
+  // Diamond volume (sphere approximation)
+  const diamondVolume = (4/3) * Math.PI * Math.pow(radius, 3);
+  
+  // Setting volume proportional to diamond
+  const settingVolume = diamondVolume * SETTING_THICKNESS_RATIO;
+  
+  // Weight = Volume × Density × Purity
+  const weight = settingVolume * density * purity;
+  
+  return Number(weight.toFixed(4));
+};
+
 const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
   const getQueryParam = (key, defaultVal, isFloat = true) => {
     const params = new URLSearchParams(window.location.search);
@@ -18,9 +42,21 @@ const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
     return isFloat ? parseFloat(params.get(key)) : params.get(key);
   };
 
-  const [karat, setKarat] = useState(() => getQueryParam('k', '14ni', false));
-  const [perLinkWeight, setPerLinkWeight] = useState(() => getQueryParam('plw', 0.080));
+  const [karat, setKarat] = useState(() => getQueryParam('k', '18pd', false));
+  const [perLinkWeight, setPerLinkWeight] = useState(() => 
+    getQueryParam('plw', calculatePerLinkWeight(1.7, '14ni'))
+  );
+  const [usePhysicsCalc, setUsePhysicsCalc] = useState(() => getQueryParam('usephys', true, false));
   const [makingCharge, setMakingCharge] = useState(() => getQueryParam('mc', 30.0));
+
+  // Auto-calculate per-link weight when diameter or karat changes
+  useEffect(() => {
+    if (usePhysicsCalc) {
+      const calculatedWeight = calculatePerLinkWeight(diameter, karat);
+      setPerLinkWeight(calculatedWeight);
+    }
+  }, [diameter, karat, usePhysicsCalc]);
+
   const [spotPrice, setSpotPrice] = useState(95); // fallback default
   const [status, setStatus] = useState('Connecting to live feed...');
   const [statusColor, setStatusColor] = useState('var(--text-secondary)');
@@ -67,8 +103,9 @@ const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
     params.set('k', karat);
     params.set('plw', perLinkWeight);
     params.set('mc', makingCharge);
+    params.set('usephys', usePhysicsCalc);
     window.history.replaceState(null, '', '?' + params.toString());
-  }, [karat, perLinkWeight, makingCharge]);
+  }, [karat, perLinkWeight, makingCharge, usePhysicsCalc]);
 
   const density = densities[karat];
   const purity = purities[karat];
@@ -80,59 +117,6 @@ const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
   const meltValue = goldGrams * spotPrice;
   const manufacturingCost = wTotal * makingCharge;
   const totalGoldCost = meltValue + manufacturingCost;
-import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
-import '../index.css';
-
-const densities = { '14ni': 12.6, '14pd': 13.7, '18ni': 14.7, '18pd': 16.4 };
-const purities = { '14ni': 0.585, '14pd': 0.585, '18ni': 0.750, '18pd': 0.750 };
-
-// Physics-based per-link weight calculation
-export const calculatePerLinkWeight = (diameterMm, karatType) => {
-  const DIAMOND_DENSITY = 3.52; // g/cm³ (for reference)
-  const SETTING_THICKNESS_RATIO = 0.35; // Gold setting is ~35% of diamond volume
-  
-  const density = densities[karatType] || 14.7;
-  const purity = purities[karatType] || 0.75;
-  
-  // Convert mm to cm
-  const diameterCm = diameterMm / 10;
-  const radius = diameterCm / 2;
-  
-  // Diamond volume (sphere approximation)
-  const diamondVolume = (4/3) * Math.PI * Math.pow(radius, 3);
-  
-  // Setting volume proportional to diamond
-  const settingVolume = diamondVolume * SETTING_THICKNESS_RATIO;
-  
-  // Weight = Volume × Density × Purity
-  const weight = settingVolume * density * purity;
-  
-  return Number(weight.toFixed(4));
-};
-
-const GoldCalculator = ({ numDiamonds, diameter, onTotalsChange }) => {
-  const getQueryParam = (key, defaultVal, isFloat = true) => {
-    const params = new URLSearchParams(window.location.search);
-    if (!params.has(key)) return defaultVal;
-    return isFloat ? parseFloat(params.get(key)) : params.get(key);
-  };
-
-  const [karat, setKarat] = useState(() => getQueryParam('k', '14ni', false));
-  const [perLinkWeight, setPerLinkWeight] = useState(() => 
-    getQueryParam('plw', calculatePerLinkWeight(1.7, '14ni')) // Calculate from default diameter
-  );
-  const [usePhysicsCalc, setUsePhysicsCalc] = useState(() => getQueryParam('usephys', true));
-  const [makingCharge, setMakingCharge] = useState(() => getQueryParam('mc', 30.0));
-  
-  // Auto-calculate per-link weight when diameter or karat changes
-  useEffect(() => {
-    if (usePhysicsCalc) {
-      const calculatedWeight = calculatePerLinkWeight(diameter, karat);
-      setPerLinkWeight(calculatedWeight);
-    }
-  }, [diameter, karat, usePhysicsCalc]);
-
   useEffect(() => {
     if (onTotalsChange) {
       onTotalsChange({ wTotal, meltValue, totalGoldCost });
