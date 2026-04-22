@@ -15,6 +15,7 @@ const alloyNotes = {
 export const calculatePerLinkWeight = (diameterMm, karatType) => {
   const DIAMOND_DENSITY = 3.52; // g/cm³ (for reference)
   const SETTING_THICKNESS_RATIO = 0.35; // Gold setting is ~35% of diamond volume
+  const BASKET_THICKNESS_RATIO = 0.25; // Gold basket is ~25% of diamond volume
   
   const density = densities[karatType] || 14.7;
   const purity = purities[karatType] || 0.75;
@@ -28,9 +29,10 @@ export const calculatePerLinkWeight = (diameterMm, karatType) => {
   
   // Setting volume proportional to diamond
   const settingVolume = diamondVolume * SETTING_THICKNESS_RATIO;
+  const basketVolume = diamondVolume * BASKET_THICKNESS_RATIO;
   
   // Weight = Volume × Density × Purity
-  const weight = settingVolume * density * purity;
+  const weight = (settingVolume + basketVolume) * density * purity;
   
   return Number(weight.toFixed(4));
 };
